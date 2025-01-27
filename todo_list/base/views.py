@@ -23,8 +23,7 @@ class CustomLoginView(LoginView):
         return reverse_lazy('tasks')
     
 
-
-
+#Register User Created Form
 class RegisterPage(FormView):
     template_name = 'base/register.html'
     form_class = UserCreationForm       #built in Form for registration
@@ -41,11 +40,6 @@ class RegisterPage(FormView):
         if self.request.user.is_authenticated:
             return redirect('tasks')
         return super(RegisterPage, self).get(*args, **kwargs)
-    
-
-
-
-
 
 
 #View Taskss
@@ -58,6 +52,13 @@ class TaskList(LoginRequiredMixin, ListView): #task_list.html
         context = super().get_context_data(**kwargs)
         context['tasks'] =  context['tasks'].filter(user= self.request.user)
         context['count'] =  context['tasks'].filter(complete=False).count()
+
+        search_input = self.request.GET.get('search-area') or ''
+        if search_input:
+            context['tasks'] = context['tasks'].filter( title__icontains=search_input) #title__startswith #title__icontains
+            
+        context['search_input'] = search_input
+
         return context
         
 
